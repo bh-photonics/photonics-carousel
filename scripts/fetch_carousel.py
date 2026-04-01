@@ -17,10 +17,13 @@ items = []
 for url in PAGES:
     try:
         response = scraper.get(url, timeout=30)
+        print(f"[{url}] status={response.status_code} length={len(response.text)}")
+        print(f"[{url}] preview: {response.text[:300]}")
         response.raise_for_status()
         soup = BeautifulSoup(response.text, "html.parser")
 
         titles = soup.select("div.LAB_CarouselTitle")
+        print(f"[{url}] found {len(titles)} LAB_CarouselTitle elements")
         for title_el in titles:
             parent = title_el.parent
             if not parent:
@@ -36,7 +39,7 @@ for url in PAGES:
             })
             break  # one item per publication page
     except Exception as e:
-        print(f"Warning: could not fetch {url}: {e}", file=sys.stderr)
+        print(f"Error fetching {url}: {e}", file=sys.stderr)
 
 # Build HTML in the same structure the Android app expects
 html_items = "\n".join(
